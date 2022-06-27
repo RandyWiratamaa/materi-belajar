@@ -26,10 +26,15 @@ Penulisannya :
 3.  }
 ```
 >**functionName => Nama sebuah function**
+>
 >**param1=>Parameter 1**
+>
 >**Type1=>Type data dari parameter 1**
+>
 >**param2=>Parameter 2**
+>
 >**Type2=>Type data dari parameter 2**
+>
 >**ReturnType=>Nilai kembalian (return)**
 
 contoh : 
