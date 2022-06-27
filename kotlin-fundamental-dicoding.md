@@ -376,3 +376,348 @@ fun main() {
 Pada kode diatas, `break` yang sudah ditandai dengan label akan dilompati ke titik awal proses perulangan yang sudah ditandai dengan label. break akan menghentikan proses perulangan terluar dari dalam proses perulangan, di mana break tersebut dipanggil.
 
 ## Data _Class_
+Kotlin mengenalkan konsep data class yang merupakan sebuah kelas sederhana yang bisa berperan sebagai data _container_. Data class adalah sebuah kelas yang tidak memiliki logika apapun dan juga tidak memiliki fungsionalitas lain selain menangani data.
+Data class mampu menyediakan beberapa fungsionalitas yang biasanya kita butuhkan untuk mengelola data hanya dengan sebuah _keyword_ **`data`**.
+
+Penulisannya :
+```
+data class User(val name : String, val age : Int)
+```
+Hanya dengan satu baris kode diatas, kompiler akan secara otomatis menghasilkan `constructor`, `toString()`, `equals()`, `hashCode()`, `copy()` dan juga fungsi `componentN()`.
+Beberapa hal yang perlu diperhatikan dalam membuat sebuah data class adalah :
+1. Konstruktor utama pada kelas tersebut harus memiliki setidaknya satu parameter
+2. Semua konstruktor utama perlu dideklarasikan sebagai **val** atau **var**
+3. Modifier dari sebuah data class tidak bisa **abstract**, **open**, **sealed**, atau **inner**
+
+## Penggunaan Data _Class_
+Perhatikan kode dibawah ini :
+```kotlin
+class User(val name: String, val age: Int)
+```
+```kotlin
+data class DataUser(val name: String, val age: Int)
+```
+Apakah perbedaan kedua kode yang diatas ? Untuk mengetahuinya buka IDE atau Android Studio dan buat sebuah file dengan nama `DataClasses.kt`. Ketikkan kedua kelas tadi didalamnya dan buat fungsi `main()` sebagai tempat dimana kita akan mencoba mengelola atau mengoperasikan kedua kelas tersebut.
+```kotlin
+class User(val name: String, val age: Int)
+
+data class DataUser(val name: String, val age: Int)
+
+fun main() {
+
+}
+```
+untuk menampilkan 2 buah objek yang dibuat dari kelas `User` dan `DataUser`. Tambahkan kode berikut kedalam `main()`
+```kotlin
+class User(val name: String, val age: Int)
+
+data class DataUser(val name: String, val age: Int)
+
+fun main() {
+    val user = User("Randy", 27)
+    val dataUser = DataUser("Randy", 27)
+
+    println(User)
+    println(DataUser)
+}
+```
+Dari hasil dari kode diatas, kita langsung mengetahui semua informasi dari `DataUser` hanya melihat _value_ dari properti yang ada. Data Class akan secara otomatis menghasilkan fungsi `toString()` didalamnya. tanpa data class, kita perlu membuat fungsi `toString()` secara manual untuk mendapatkan informasi seperti yang diberikan oleh objek `DataUser`.
+Sebagai contoh, untuk menampilkan informasi yang jelas dari objek `User`, maka kita perlu menambahkan fungsi `toString()` seperti berikut:
+```kotlin
+class User(val name: String, val age: Int) {
+    override fun toString(): String {
+        return "User(name=$name, age=$age)"
+    }
+}
+```
+Dengan menambahkan fungsi `toString()` seperti di atas, maka objek `User` akan bisa menghasilkan teks yang sama dengan objek `DataUser`.
+
+Selanjutnya, kelebihan lain dari data class adalah ia sudah memiliki fungsi `equals()` secara otomatis, yang berguna untuk komparasi 2 buah objek. Contohnya seperti berikut :
+```kotlin
+data class DataUser(val name: String, val age: Int)
+
+fun main() {
+
+    val dataUser = DataUser("randy", 27)
+    val dataUser2 = DataUser("randy", 27)
+    val dataUser3 = DataUser("wiratama", 24)
+ 
+    println(dataUser.equals(dataUser2)) // Hasilnya true
+    println(dataUser.equals(dataUser3)) // Hasil false
+ 
+}
+```
+Lain halnya jika kita melakukan komparasi pada 2 buah objek yang bukan dari data class. Kita tidak bisa mendapatkan hasil yang akurat karena konsol akan selalu menghasilkan nilai false.
+
+Dan jika Anda menginginkan hasil yang akurat seperti pada data class, maka Anda perlu membuat fungsi `equals()` secara manual:
+```kotlin
+class User(val name : String, val age : Int){
+ 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+ 
+        other as User
+ 
+        if (name != other.name) return false
+        if (age != other.age) return false
+ 
+        return true
+    }
+ 
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + age
+        return result
+    }
+}
+```
+Kita perlu menuliskan beberapa _boilerplate_ code di atas untuk mendapatkan hasil yang sesuai. Belum lagi ketika menambahkan fungsi `equals()`, Kita juga perlu menambahkan fungsi `hashCode()`.
+
+## Menyalin dan Memodifikasi Data _Class_
+Data class juga memungkinkan kita untuk menyalin sebuah objek dengan sangat mudah hanya dengan memanfaatkan fungsi `copy()` di dalamnya. Sebagai contoh :
+```kotlin
+data class DataUser(val name: String, val age: Int)
+
+fun main(){
+    val dataUser = DataUser("randy", 27)
+    val dataUser2 = DataUser("randy", 27)
+    val dataUser3 = DataUser("wiratama", 28)
+    val dataUser4 = dataUser.copy()
+ 
+    println(dataUser4)
+
+    /*
+    output :
+    name = randy, age = 27
+    */
+}
+```
+Menariknya, dengan fungsi `copy()` kita juga bisa memodifikasi objek tersebut dengan nilai yang baru. Contoh :
+```kotlin
+data class DataUser(val name: String, val age: Int)
+
+fun main(){
+    val dataUser = DataUser("randy", 27)
+    val dataUser2 = DataUser("randy", 27)
+    val dataUser3 = DataUser("wiratama", 28)
+    val dataUser4 = dataUser.copy(age = 26)
+ 
+    println(dataUser4)
+
+    /*
+    output :
+    name = randy, age = 26
+    */
+}
+```
+
+## Destructuring Declarations
+Destructuring Declarations adalah proses memetakan objek menjadi sebuah variable. Ini bisa dengan mudah kita lakukan pada data class. Dengan fungsi `componentN` yang ada pada data class, kita bisa menguraikan sebuah objek menjadi beberapa properti yang dimilikinya, sebagai contoh :
+```kotlin
+data class DataUser(val name: String, val age: Int)
+
+fun main() {
+    val dataUser = DataUser("Randy", 27)
+
+    val name = dataUser.component1()
+    val age = dataUser.component2()
+
+    println("My name is $name, I am $age years old")
+
+    /*
+    console output :
+    My name is Randy, I am 27 years old
+    */
+}
+```
+fungsi `component1()` dan `component2()` dihasilkan sesuai dengan jumlah properti yang ada pada data class tersebut. Maka jika sebuah data class memiliki sejumlah **N** properti, maka secara otomatis `componentN()` akan dihasilkan.
+
+Kita juga dapat membuat beberapa variable dari objek secara langsung dengan kode seperti berikut :
+```kotlin
+data class DataUser(val name: String, val age: Int)
+
+fun main(){
+    val dataUser = DataUser("Randy", 27)
+    val (name, age) = dataUser
+ 
+    println("My name is $name, I am $age years old")
+
+    /*
+    console output :
+    My name is Randy, I am 27 years old
+    */
+}
+```
+Kesimpulannya, seperti aspek-aspek lain dari kotlin, data class bertujuan untuk mengurangi jumlah kode _boilerplate_ yang kita tuliskan. Dan perlu diketahui bahwa data class tidak hanya sekedar untuk mengelola properti yang ada didalamnya. Ketika mempunyai data yang sangat kompleks, kita juga bisa menerapkan sebuah _behavior_ didalam data class. Contoh sederhananya kita bisa membuat fungsi didalam data class seperti berikut :
+```kotlin
+data class DataUser(val name: String, val age: Int) {
+    fun intro() {
+        println("My name is $name, I am $age years old")
+    }
+}
+```
+dan langsung mengaksesnya pada fungsi `main()` 
+```kotlin
+fun main() {
+   val dataUser = DataUser("Randy", 27)
+   dataUser.intro()
+}
+```
+
+## Collection
+Collection adalah sebuah objek yang dapat menyimpan kumpulan objek lain termasuk data class. Dengan collection kita bisa menyimpan banyak data sekaligus. Di dalam collections terdapat beberapa objek turunan, di antaranya adalah **List**, **Set**, dan **Map**.
+
+## List
+Dengan List kita dapat menyimpan banyak data menjadi satu objek. Sebagai contoh, kita bisa membuat sebuah List yang berisi sekumpulan data angka, karakter atau yang lainnya. Yang menarik, sebuah List tidak hanya bisa menyimpan data dengan tipe yang sama. Namun juga bisa berisi bermacam - macam tipe data seperti **Int**, **String**, **Boolean** atau yang lainnya. Cara penulisannya pun sangat mudah. Perhatikan saja beberapa contoh kode berikut :
+```kotlin
+val numberList : List<Int> = listOf(1, 2, 3, 4, 5)
+```
+
+Kode di atas adalah contoh dari satu objek List yang berisi kumpulan data dengan tipe Integer. Karena kompiler bisa mengetahui tipe data yang ada dalam sebuah objek List, maka tak perlu kita menuliskannya secara eksplisit. Ini tentunya akan menghemat kode yang kita ketikkan:
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5)
+val charList = listOf('a', 'b', 'c')
+```
+Sedangkan untuk membuat List dengan tipe data yang berbeda, cukup masukkan saja data tersebut seperti kode berikut :
+```kotlin
+val dataList = listOf('a', "Kotlin", 3, true)
+```
+Karena setiap objek pada Kotlin merupakan turunan dari kelas Any, maka variabel anyList tersebut akan memiliki tipe data `List<Any>`. Jika kita tampilkan list di atas maka konsol akan menampilkan:
+```
+[a, Kotlin, 3, true]
+```
+Bahkan kita pun bisa memasukkan sebuah data class ke dalam List tersebut:
+
+```kotlin
+val dataList = listOf('a', "Kotlin", 3, true, User())
+```
+Ketika bermain dengan sebuah List, tentunya ada saat di mana kita ingin mengakses posisi tertentu dari List tersebut. Untuk melakukannya, kita bisa menggunakan fungsi _indexing_ seperti berikut:
+```kotlin
+println(dataList[3])
+```
+Jika kita berusaha menampilkan item dari List yang berada dari luar ukuran List tersebut adalah akan muncul error dengan pesan error `Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 5`
+
+Pesan di atas memberitahu kita bahwa List telah diakses dengan indeks ilegal. Ini akan terjadi jika indeks yang kita inginkan negatif atau lebih besar dari atau sama dengan ukuran List tersebut.
+
+Jika kita ingin mengubah atau menambah data pada suatu List, kita harus menambahkan fungsi `mutableListOf` seperti berikut :
+```kotlin
+val dataList = mutableListOf('a', "Kotlin", 3, true, User())
+```
+dengan begitu, `dataList` sekarang merupakan sebuah List yang bersifat **mutable** dan kita memanipulasi data didalamnya.
+```kotlin
+val dataList = mutableListOf('a', "Kotlin", 3, true, User())
+
+dataList.add('tambahan List') // menambahkan item pada akhir List
+dataList.add(1, 'tambahan List') //menambahkan List pada index ke-1
+dataList[3] = false // mengubah nilai item pada index ke-3
+dataList.removeAt(1) //mengahapus item User() berdasarkan index atau posisi nilai di dalam array
+```
+
+## Set
+Set merupakan sebuah collection yang hanya dapat menyimpan nilai yang unik. Ini akan berguna ketika kita menginginkan tidak ada data yang sama atau duplikasi dalam sebuah collection. Kita bisa mendeklarasikan sebuah Set dengan fungsi `setOf`.
+```kotlin
+val integerSet = setOf(1, 2, 4, 2, 1, 5)
+```
+Perhatikan kode di atas. Di sana terdapat beberapa angka yang duplikat, yaitu angka 1 dan 2. Silakan tampilkan pada konsol dan lihat hasilnya.
+```kotlin
+println(integerSet)
+ 
+// Console output: [1, 2, 4, 5]
+```
+Secara otomatis fungsi `setOf` akan membuang angka yang sama, sehingga hasilnya adalah `[1, 2, 4, 5]`. Selain itu urutan pada Set bukanlah sesuatu yang penting, sehingga apabila kita bandingkan dua buah Set yang memiliki nilai yang sama dan urutan yang berbeda, akan tetap dianggap sama.
+```kotlin
+val setA = setOf(1, 2, 4, 2, 1, 5)
+val setB = setOf(1, 2, 4, 5)
+println(setA == setB)
+
+// Console output : true
+```
+Kita juga dapat melakukan pengecekan apakah sebuah nilai ada di dalam Set dengan menggunakan kata kunci `in`.
+```kotlin
+val setA = setOf(1, 2, 4, 2, 1, 5)
+val setB = setOf(1, 2, 4, 5)
+println(5 in setA)
+
+// Console output : true
+```
+Kemudian ada juga fungsi union dan _intersect_ untuk mengetahui gabungan dan irisan dari 2 (dua) buah Set. Sebagai contoh :
+```kotlin
+val setA = setOf(1, 2, 4, 2, 1, 5)
+val setC = setOf(1, 5, 7)
+val union = setA.union(setC) // Menggabungkan setA dengan setC
+val intersect = setA.intersect(setC) //pengirisan setA dan setC
+
+println(union)
+println(intersect)
+
+// union : [1,2,4,5,7]
+// intersect : [1,5]
+```
+Pada Mutable Set, kita bisa menambah dan menghapus items Set, tetapi tidak dapat mengubah nilainya seperti pada List.
+```kotlin
+val dataSet = mutableSetOf(1,2,4,2,1,5)
+dataSet.add(6) // Menambah item pada akhir set
+dataSet.remove(1) // Menghapus item yang memiliki nilai 1
+```
+
+## Map
+Map adalah sebuah collection yang dapat menyimpan data dengan format **key-value**. Sebagai contoh :
+```kotlin
+val capital = mapOf(
+    "Jakarta" to "Indonesia",
+    "London" to "England",
+    "Bangkok" to "Thailand"
+)
+```
+> String yang berada pada sebelah kiri `to` adalah sebuah **key**
+> 
+> String yang berada pada sebelah kanan `to` adalah sebuah **value**
+
+Untuk mengakses nilai dari Map tersebut, kita bisa menggunakan key yang sudah dimasukkan. Misalnya kita bisa menggunakan key **`Jakarta`** untuk mendapatkan value **`Indonesia`**
+```kotlin
+println(capital["Jakarta]) 
+
+// Console output : Indonesia
+```
+Atau bisa juga menggunakan fungsi `getValue()`:
+```kotlin
+println(capital.getValue("Jakarta")) 
+
+// Console output : Indonesia
+```
+Hasilnya sama saja. Namun sebenarnya terdapat sebuah perbedaan antara keduanya. Saat menggunakan simbol **[ ]** atau yang kita kenal dengan indexing, konsol akan menampilkan hasil **null** saat key yang dicari tidak ada di dalam Map. Sedangkan saat kita menggunakan `getValue()`, konsol akan memberikan sebuah **Exception**.
+
+```kotlin
+println(capital["Amsterdam"])
+ 
+// Output: null
+ 
+ 
+println(capital.getValue("Amsterdam"))
+ 
+// Output: Exception in thread "main" java.util.NoSuchElementException: Key Amsterdam is missing in the map.
+```
+Kita dapat menampilkan key apa saja yang ada di dalam Map dengan menggunakan fungsi `keys()`. Fungsi ini akan mengembalikan nilai berupa Set karena key pada Map haruslah unik.
+```kotlin
+val mapKeys = capital.keys
+ 
+// mapKeys: [Jakarta, London, Bangkok]
+```
+Sedangkan untuk mengetahui nilai apa saja yang ada di dalam Map kita bisa menggunakan fungsi `values()`. Fungsi ini akan mengembalikan collection sebagai tipe datanya.
+```kotlin
+val mapValues = capital.values
+ 
+// mapValues: [Indonesia, England, Thailand]
+```
+Untuk menambahkan **key-value** ke dalam map, kita perlu memastikan bahwa map yang digunakan adalah **mutable**. Mari kita ubah map capital yang sudah kita buat sebelumnya menjadi **mutable**.
+```kotlin
+val mutableCapital = capital.toMutableMap()
+```
+```kotlin
+mutableCapital.put("Amsterdam", "Netherlands")
+mutableCapital.put("Berlin", "Germany")
+```
+***Note :***
+
+Perlu diperhatikan bahwa menggunakan mutable collection itu tidak disarankan. Apabila terdapat sebuah mutable collection yang diubah oleh lebih dari 1 proses, hasil nya akan sulit untuk diprediksi. Untuk itu, sebaiknya gunakan immutable sebisa mungkin, jika memang dibutuhkan untuk diubah, baru gunakan mutable.
