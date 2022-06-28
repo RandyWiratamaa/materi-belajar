@@ -726,3 +726,119 @@ mutableCapital.put("Berlin", "Germany")
 ***Note :***
 
 Perlu diperhatikan bahwa menggunakan mutable collection itu tidak disarankan. Apabila terdapat sebuah mutable collection yang diubah oleh lebih dari 1 proses, hasil nya akan sulit untuk diprediksi. Untuk itu, sebaiknya gunakan immutable sebisa mungkin, jika memang dibutuhkan untuk diubah, baru gunakan mutable.
+
+## Collections Operations
+Collection juga memiliki beberapa fungsi operasi yang bisa kita gunakan untuk mengakses data didalamnya.
+
+## filter() dan filterNot()
+Kedua fungsi ini akan menghasilkan list baru dari seleksi berdasarkan kondisi yang kita berikan. Sesuai dengan namanya, untuk mem-filter atau menyaring suatu data dalam sebuah collection. Contohnya dapat kita lihat pada kode berikut:
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val evenList = numberList.filter { it % 2 == 0 }
+
+// output [2,4,6,7,10]
+```
+Pada kode di atas, kita telah menggunakan `filter()` untuk menyaring bilangan yang habis dibagi 2 (dua) atau biasa disebut dengan bilangan genap. Selain itu kita juga dapat mem-filter list berdasar hasil yang tak sesuai dengan kondisi yang diberikan. Caranya adalah dengan menggunakan fungsi `filterNot()`.
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val notEvenList = numberList.filterNot { it % 2 == 0 }
+ 
+// notEvenList: [1, 3, 5, 7, 9]
+```
+
+## map()
+Fungsi `map()` akan membuat collection baru sesuai perubahan yang akan kita lakukan dari collection sebelumnya. Coba perhatikan contoh berikut :
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val multipliedBy5 = numberList.map { it * 5 }
+ 
+// outuput: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+```
+Contoh diatas, kita membuat collection baru yang isinya adalah hasil kali dari `numberList`. `it` pada kode diatas merepresentasikan masing-masing item pada `numberList`.
+
+## count()
+`count` kita gunakan untuk menghitung jumlah item yang ada di dalam collection.
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+print(numberList.count())
+ 
+// Output: 10
+```
+Di dalam fungsi `count()` kita juga bisa menambahkan sebuah parameter berupa lambda yang berisi sebuah kondisi. Sebagai contoh kali ini kita akan menampilkan jumlah item pada numberList yang merupakan kelipatan dari 3.
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+print(numberList.count { it % 3 == 0 })
+ 
+// Output: 3
+```
+
+## find(), firstOrNull(), dan lastOrNull()
+Selanjutnya adalah fungsi yang digunakan untuk mencari item pada sebuah collection. Untuk mencari item pertama yang sesuai dengan kondisi yang kita tentukan, kita bisa menggunakan fungsi find(). Contoh, kita perlu mencari angka ganjil pertama dari numberList maka kodenya akan seperti berikut:
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val firstOddNumber = numberList.find { it % 2 == 1 }
+val firstOrNullNumber = numberList.firstOrNull { it % 2 == 3 }
+ 
+// firstOddNumber: 1
+// firstOrNullNumber: null
+```
+Fungsi `find()` ini memiliki cara kerja yang sama dengan fungsi `firstOrNull`(). Artinya, jika di dalam collection tidak ditemukan data yang sesuai, maka fungsi akan mengembalikan nilai **null**.
+Tidak seperti fungsi `filter()` atau `map()` yang akan melakukan iterasi terhadap seluruh item, fungsi `find()` dan `firstOrNull()` ini akan langsung mengembalikan nilai ketika kondisi terpenuhi. Kemudian jika Anda ingin mencari item terakhir, gunakan fungsi `lastOrNull()`.
+
+## first() dan last()
+Hampir sama seperti fungsi `firstOrNull()` dan `lastOrNull()`, fungsi `first()` dan `last()` digunakan untuk menyaring item pertama atau terakhir dari sebuah collection. Kita juga bisa menambahkan sebuah kondisi dengan parameter lambda. Namun jika kondisi tidak terpenuhi akan menghasilkan error `Exception`
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val moreThan10 = numberList.first { it > 10 }
+print(moreThan10)
+ 
+// Output: Exception in thread "main" java.util.NoSuchElementException: Collection contains no element matching the predicate.
+```
+
+## sum()
+Fungsi `sum()` khusus hanya bisa digunakan untuk collection yang bertipe angka. Fungsi ini akan menjumlahkan setiap data yang ada pada collection.
+```kotlin
+val numberList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val total = numberList.sum()
+ 
+// total: 55
+```
+
+## sorted()
+`sorted()` digunakan untuk mengurutkan item yang ada di dalam collection. Secara default fungsi `sorted()` ini akan mengurutkan data secara _ascending_. Perhatikan kode di bawah ini:
+```kotlin
+val kotlinChar = listOf('k','o','t','l','i','n')
+val ascSort = kotlinChar.sorted() //Ascending Sort
+val descSort = kotlinChar.sortedDescending() //Descending Sort
+println(ascSort)
+
+// AscendingSort : [i, k, l, n, o, t]
+// descendingSort: [t, o, n, l, k, i]
+```
+
+## Sequences
+Sequence merupakan collection yang bisa dikategorikan ke dalam `lazy evaluation`. Jika pada `eager evaluation` mengevaluasi seluruh item pada collection, `lazy evaluation` hanya akan mengevaluasi item jika benar-benar diperlukan. Kita ambil contoh, misal kita mempunyai collection dengan jumlah data 10 atau 100, itu mungkin tidak akan memberi pengaruh besar terhadap performa program. Namun apa yang terjadi jika data yang ada pada collection mencapai ratusan ribu atau jutaan? Waktu proses pada sebuah program akan bertambah signifikan jika semua datanya harus dievaluasi. 
+```kotlin
+fun main() {
+    val list = (1..1000000).toList()
+    list.filter { it % 5 == 0 }.map { it * 2 }.forEach { println(it) }
+}
+```
+pada contoh kode diatas, kita memiliki data collection sebanyak 1 juta item, kemudian masing-masing data akan disaring berdasarkan angka yang merupakan kelipatan 5 lalu dikalikan 2 dan akhirnya ditampilkan di _console_. Dengan _eager evaluation_ atau dikenal dengan _horizontal evaluation_, list akan menyelesaikan proses filter terhadap 1 juta data baru kemudian melakukan mapping data sampai akhirnya ditampilkan pada _console_.
+
+Untuk menerapkan _lazy_ atau _vertical evaluation_ maka kita perlu mengubah list menjadi Sequence. caranya sangat sederhana, yaitu dengan memanggil fungsi `asSequence()`.
+```kotlin
+fun main() {
+    val list = (1..1000000).toList()
+    list.asSequence().filter { it % 5 == 0 }.map { it * 2 }.forEach { println(it) }
+}
+```
+Dengan sequence, operasi akan dilakukan secara vertikal atau per item.
+
+Untuk membuat objek sequence, kita bisa menggunakan fungsi yang tersedia pada _standard library_ yaitu `generateSequence()`.
+```kotlin
+fun main() {
+    val sequenceNumber = generateSequence(1) { it + 1}
+    sequenceNumber.take(5).forEach { println("$it ") }
+}
+```
