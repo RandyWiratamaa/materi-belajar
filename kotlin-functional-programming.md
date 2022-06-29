@@ -1,5 +1,7 @@
 # Kotlin Functional Programming
+---
 ## Functional Programming
+---
 Untuk mengawalinya, perhatikan kode berikut:
 ```kotlin
 val list = getListUser()
@@ -21,6 +23,7 @@ fun getUsername(): List<String>{
 }
 ```
 ## Anatomi Function
+---
 Pada dasarnya sebuah fungsi memiliki 2 (dua) bagian utama yaitu **function header** dan **function body**.
 
 ### Function Header
@@ -52,6 +55,7 @@ Lalu apakah tipe ini harus ditentukan setiap deklarasi sebuah fungsi? Tentu tida
 **function body** ditandai dengan _curly braces_. Di dalamnya kita akan menempatkan sebuah logika kode baik itu sebuah _expression_ atau _statement_. Seperti yang dijelaskan pada sub-modul pengenalan, jika kita menetapkan sebuah fungsi dapat mengembalikan nilai, maka kita wajib menambah sebuah baris kode yang diawali dengan kata kunci return yang diikuti oleh _expression_ untuk menetapkan nilai yang akan dikembalikan.
 
 ## Named Argument
+---
 Penamaan pada argument ini berguna agar pada penulisan parameter kita tidak perlu lagi untuk menghafal posisi.
 ```kotlin
 fun getFullName(first: String, middle: String, last: String): String {
@@ -70,10 +74,11 @@ fun getFullName(first: String, middle: String, last: String): String {
 }
 ```
 ## Default Argument
+---
 Kotlin juga memungkinkan kita untuk menentukan nilai _default_ dari sebuah parameter. Jika melewatkan argumen untuk dilampirkan, maka nilai _default tersebutlah yang akan digunakan.
 
 Untuk menambahkan nilai default itu sendiri pun cukup mudah, yaitu dengan cara menempatkannya langsung tepat di samping dari parameter seperti halnya ketika ingin menginisialisasikan sebuah nilai untuk variabel. Contohnya seperti berikut:
-```kotlin
+```java
 fun getFullName(
         first: String = "Belajar", 
         middle: String = " Kotlin ", 
@@ -82,7 +87,7 @@ fun getFullName(
 }
 ```
 Kita bisa memanggil fungsi di atas seperti biasanya. Tetapi karena parameternya sudah memiliki nilai, maka argumen untuk fungsi tersebut bisa dilewatkan ketika dipanggil.
-```kotlin
+```java
 fun main() {
     val fullName = getFullName()
     println(fullName)
@@ -98,7 +103,7 @@ fun getFullName(
     //output : Belajar Kotlin Dicoding
 ```
 Ketika kita telah menetapkan nilai default, kita tak perlu khawatir saat lupa melampirkan sebuah argumen. Tentunya ini menghindari kita dari eror. Meskipun begitu, kita tetap bisa melampirkan sebuah argumen. Contohnya seperti berikut:
-```kotlin
+```java
 fun main() {
     val fullName = getFullName(first = "Materi")
     println(fullName)
@@ -115,6 +120,7 @@ fun getFullName(
 ```
 
 ## Vararg (Variable Argument)
+---
 Dengan _keyword_ `vararg` kita juga bisa menyederhanakan beberapa parameter yang memiliki tipe data sama menjadi parameter tunggal.
 
 Dengan `vararg` sebuah fungsi dapat memiliki jumlah parameter berdasarkan jumlah argumen yang kita masukkan ketika fungsi tersebut dipanggil. Contohnya adalah :
@@ -863,3 +869,178 @@ println(take)
 
 // output : [6,7,8]
 ```
+
+## Slice
+Setelah pembahasan fungsi `take()` pada sub-modul sebelumnya, muncul pertanyaan, bagaimana jika kita ingin menyaring item dari posisi tertentu? Untuk itu kita bisa memanfaatkan fungsi `slice()`. Dalam penggunaannya, fungsi `slice()` membutuhkan sebuah argumen berupa Range yang digunakan untuk menentukan posisi pertama dan terakhir yang akan disaring. Berikut contohnya:
+```java
+val total = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val slice = slice('3..6')
+
+println(slice)
+
+// output : [4,5,6,7]
+```
+Karena menggunakan **Range**, kita juga bisa menggunakan operator `step` ketika argumennya disematkan seperti berikut:
+```java
+val total = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val slice = slice('3..6 step 2')
+
+println(slice)
+
+// output : [4,6]
+```
+Kemudian jika ingin menentukan posisi yang lebih spesifik, kita bisa mendefinisikannya di dalam sebuah _collection_, kemudian disematkan sebagai argumen. Misal seperti di bawah berikut:
+```java
+val index = listOf(2, 3, 5, 8)
+val total = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+val slice = total.slice(index)
+
+println(slice)
+
+// output : [3,4,6,9]
+```
+Kita harus berhati-hati dalam menentukan cakupan index untuk mendapatkan data. Karena dapat menyebabkan terjadinya **ArrayIndexOutOfBoundsException** jika posisi yang ditentukan tidak terdapat pada objek _collection_.
+
+## Distinct
+Saat berurusan dengan item yang sama di dalam sebuah _collection_, untuk menyaring item yang sama tersebut kita akan melakukan iterasi dan membandingkan setiap itemnya. Namun dengan Kotlin kita tidak perlu melakukannya secara manual, karena Kotlin _Collection_ menyediakan fungsi untuk melakukannya dengan mudah yaitu fungsi `distinct()`. Sebagai contoh:
+```java
+val total = listOf(1,2,1,3,4,5,2,3,4,5)
+val disticnt = total.distinct()
+
+println(distinct)
+
+// output : [1,2,3,4,5]
+```
+Sama halnya seperti beberapa fungsi sebelumnya yang sudah dibahas, fungsi `distinct()` bisa langsung dipanggil dari objek _collection_. Kita juga bisa menggunakannya pada _collection_ dengan tipe parameter seperti data **class**. Misal seperti berikut:
+```java
+data class Item(val key: String, val value: Any)
+
+val Item = listOf(
+    Item("1", "Belajar")
+    Item("2", "Kotlin")
+    Item("3", "Dicoding")
+    Item("3", "Tahun")
+    Item("3", "2022")
+)
+
+val distinctItems = itens.distinctBy { it.key }
+distinctItems.forEach {
+    println("${it.key} with value = ${it.value}")
+}
+
+/*
+output :
+    1 with value = Belajar
+    2 with value = Kotlin
+    3 with value = Dicoding
+*/
+```
+Menariknya, kita bisa juga menentukan proses penyaringan item yang sama seperti apa yang akan dijalankan dengan menggunakan fungsi distinctBy(). Misal kita ingin menyaring item yang memiliki panjang sama, kita bisa melakukannya seperti berikut:
+```java
+val text = listOf("A", "B", "CC", "DD", "EEE", "F", "GGGG")
+val distinct = text.distinctBy {
+    it.length
+}
+
+println(distinct)
+
+// output : [A, CC, EEEE, GGGG]
+```
+yang perlu diperhatikan, fungsi `distinct()` tidak dapat digunakan pada Object Map Collection
+
+## Chunked
+Sama seperti fungsi `split()`, fungsi `chunked()` bisa kita gunakan untuk memecah nilai String menjadi beberapa bagian kecil dalam bentuk Array. Namun untuk penerapannya sedikit berbeda, di mana fungsi `split()` membutuhkan argumen berupa RegEx sebagai parameter sedangkan `chunked()` membutuhkan nilai yang akan digunakan sebagai jumlah indeks untuk pemisah. Contoh penggunaannya seperti berikut:
+```java
+val word = "QWERTY"
+val chunked = word.chunked(3)
+
+println(chunked)
+
+// output : [QWE, RTY]
+```
+Selain itu, kita juga bisa menggunakannya untuk memodifikasi setiap nilai yang sudah dipecah. Contoh, hasil dari nilai yang sudah dipecah ingin kita buat menjadi huruf kecil, maka kita bisa menggunakan fungsi `chunked()` seperti berikut: 
+```java
+val word = "QWERTY"
+val chunked = word.chunked(3) {
+    it.toString().toLowerCase() // mengubah menjadi huruf kecil
+}
+
+println(chunked)
+
+// output : [qwe, rty]
+```
+Argumen yang berada pada lambda expression di atas merepresentasikan setiap nilai yang sudah dipecah.
+
+## Recursion
+Recursion merupakan sebuah teknik dasar dalam pemrograman yang bisa kita gunakan untuk menyederhanakan pemecahan masalah yang umumnya diselesaikan dengan cara yang kompleks. Di Kotlin, recursion disebut juga dengan _recursive function_.
+
+Recursive function adalah sebuah mekanisme di mana sebuah fungsi digunakan dari dalam fungsi itu sendiri. Ini memungkinkan sebuah fungsi dapat berjalan beberapa kali. Setiap pemanggilannya bisa kita atur agar dapat mengembalikan nilai dan digunakan sebagai argumen untuk pemanggilan fungsi berikutnya serta mengembalikan nilai akhir berupa perhitungan nilai kembalian dari setiap pemanggilan fungsi tersebut.
+
+Lalu penyelesaian seperti apa yang dapat kita lakukan dengan recursive? Perhatikan kode di bawah ini:
+```java
+fun factorial(n: Int): Int {
+    return if(n == 1) {
+        n
+    } else {
+        var result = 1
+        for(i in 1..n) {
+            result *= i
+        }
+        result
+    }
+}
+```
+Fungsi di atas adalah contoh bagaimana menghitung faktorial dari nilai yang kita tentukan. Nah, tidak ada yang salah dengan kode tersebut dan dapat dijalankan serta mengembalikan nilai sesuai dengan yang kita inginkan. Namun jika kita perhatikan, untuk menghitung nilai akhir, kode di atas menggunakan _for loop_ yang di setiap iterasinya terdapat proses perhitungan nilai yang akan dikembalikan sebagai nilai akhir. Dengan recursive kita bisa menentukan nilai akhir tersebut dengan cara yang lebih sederhana. Berikut contoh ketika kode di atas ditulis dengan mekanisme recursive:
+```java
+fun factorial(n: Int): Int {
+    return if(n == 1) {
+        n
+    } else {
+        n * factorial(n - 1)
+    }
+}
+```
+Ketika kita menjalankan fungsi di atas, program akan menciptakan tumpukan _frame_ dengan jumlah berdasarkan nilai **n** di mana setiap _frame_ akan mengkonsumsi memori. Ini bisa jadi masalah dalam penerapannya. Contoh, jika kita memasukkan argumen dengan nilai besar ketika ingin menggunakannya seperti berikut:
+``` java
+fun main() {
+    println("Factorial 9999 is = ${factorial(9999)}")
+}
+
+fun factorial(n: Int): Int {
+    return if(n == 1) {
+        n
+    } else {
+        n * factorial(n - 1)
+    }
+}
+```
+Maka pada konsol akan menampilkan eror berikut:
+**`Exception in thread "main" java.lang.StackOverflowError`**
+
+## Tail Call Recursion
+Namun kita tidak perlu khawatir dengan masalah seperti di atas. Kotlin mendukung gaya pemrograman fungsional yang bernama _tail recursion_ yakni sekumpulan urutan instruksi untuk menjalankan tugas tertentu (**subroutine**) yang dijalankan terakhir pada sebuah prosedur.
+
+Dengannya, kita bisa meminimalisir penumpukan frame ketika kita menerapkan recursive. **Tail recursion** akan memastikan proses sebelumnya telah selesai sebelum pemanggilan fungsi berikutnya dijalankan. Contohnya adalah seperti berikut:
+```java
+fun factorial(n: Int, result: Int = 1): Int {
+    val newResult = n * result
+    return if(n == 1) {
+        newResult
+    } else {
+        factorial(n - 1, newResult)
+    }
+}
+```
+Namun dengan kode di atas, kita tidak bisa langsung menghindari penumpukan _frame_. Ini karena secara default JVM tidak mendukung optimasi ***tail recursion***. Untuk itu, Kotlin menyediakan _modifier_ agar kita bisa tetap menerapkannya, yaitu _modifier_ `tailrec`. Penggunaanya adalah seperti berikut :
+```java
+tailrec fun factorial(n: Int, result: Int = 1): Int {
+    val newResult = n * result
+    return if(n == 1) {
+        newResult
+    } else {
+        factorial(n - 1, newResult)
+    }
+}
+```
+Pada kode diatas, _modifier_ `tailrec` ditempatkan sebelum kata kunci `fun`. Ketika sebuah fungsi ditandai dengan modifier `tailrec`, maka fungsi tersebut hanya boleh dipanggil untuk dijalankan terakhir dan tidak boleh digunakan dari dalam blok **try-catch-finally**.
+
